@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
     private double value = 0.0;
     private int people = 0;
     private double result = 0;
+    private DecimalFormat df = new DecimalFormat("0.00");
+
 
     EditText totalValue;
     EditText numPeople;
@@ -43,15 +45,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        totalValue = (EditText) findViewById(R.id.totalValue);
-        numPeople = (EditText) findViewById(R.id.numPeople);
-        valuePerPerson = (TextView) findViewById(R.id.valuePerPerson);
+        totalValue = findViewById(R.id.totalValue);
+        numPeople = findViewById(R.id.numPeople);
+        valuePerPerson = findViewById(R.id.valuePerPerson);
 
-        shareButton = (FloatingActionButton) findViewById(R.id.shareButton);
-        voiceButton = (FloatingActionButton) findViewById(R.id.voiceButton);
+        shareButton = findViewById(R.id.shareButton);
+        voiceButton = findViewById(R.id.voiceButton);
 
 
-        valuePerPerson.setText("$ 0.00");
+        valuePerPerson.setText("R$ 0.00");
         totalValue.addTextChangedListener(this);
         numPeople.addTextChangedListener(this);
 
@@ -59,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
             @Override
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
-                    tts.setLanguage(Locale.US);
+                    Locale localeBR = new Locale("pt", "BR");
+                    tts.setLanguage(localeBR);
                 }
             }
         });
@@ -67,17 +70,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         voiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String dollars = String.valueOf(Math.floor(result));
+                String dollars = String.valueOf((int) Math.floor(result));
                 String cents = String.valueOf((int) ((result - Math.floor(result)) * 100));
                 String text;
 
                 if (cents.equals("0")) {
-                    text = dollars + " dollars";
+                    text = dollars + " reais";
                 } else if (dollars.equals("0.0")) {
-                    text = cents + " cents";
-
+                    text = cents + " centavos";
                 } else {
-                    text = dollars + " dollars and " + cents + " cents";
+                    text = dollars + " reais e " + cents + " centavos";
 
                 }
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message) + result);
+                intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message) + df.format(result));
                 startActivity(intent);
             }
         });
@@ -113,15 +115,13 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
             people = Integer.parseInt(numPeople.getText().toString());
 
             if ((value != 0) && (people != 0)) {
-                DecimalFormat df = new DecimalFormat("0.00");
-
                 BigDecimal bd = new BigDecimal(value / people).setScale(2, RoundingMode.HALF_UP);
                 result = bd.doubleValue();
 
-                valuePerPerson.setText("$ " + df.format(result));
+                valuePerPerson.setText("R$ " + df.format(result));
             }
         } catch (Exception e) {
-            valuePerPerson.setText("$ 0.00");
+            valuePerPerson.setText("R$ 0.00");
             result = 0;
         }
     }

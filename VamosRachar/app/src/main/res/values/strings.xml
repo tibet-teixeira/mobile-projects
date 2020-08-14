@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Vamos Rachar</string>
     <string name="home_screen_title">Vamos\nRachar!</string>
-    <string name="share_message">Valor pago por cada pessoa é $ </string>
+    <string name="share_message">Valor pago por cada pessoa é R$ </string>
 </resources>
